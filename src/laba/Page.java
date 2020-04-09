@@ -2,7 +2,7 @@ package laba;
 
 public class Page {
     private boolean existance; //наличие страницы в физической памяти
-    private int numberFrame; // номер физической страницы
+    private int numberFrame; // номер фрейма
 
     public Page(boolean existance){
         this.existance = existance;
