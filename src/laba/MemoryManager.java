@@ -4,71 +4,64 @@ import java.util.ArrayList;
 
 public class MemoryManager {
 	private PagesTable tablePages;
-    //private ArrayList<Page> physicalMemory;
 	private FramesTable physicalMemory;
     private int countPageFrames;
 	ArrayList<Integer> callsSequence = new ArrayList<>(); //последовательность недавно загруженных страниц
 
-
+    public void viewInfo(){
+        System.out.println();
+        System.out.println("Физическая память\n" + " i бит-присутствия");
+        int counter = 0;
+        for (Page frame : physicalMemory.getFrameNotes()) {
+            System.out.println(" " + counter + "\t" + frame.doesExist());
+            counter++;
+        }
+        System.out.println("Таблица страниц\n" + " i бит-присутс. номер фрейма ");
+    	int count = 0;
+        for (Page page : tablePages.getPagesNotes()) {
+        		System.out.println(" " + count + "\t " + page.doesExist() + "\t " + page.getPageFrameNumber());
+        		counter++;
+        }
+        System.out.println();
+    }
     public MemoryManager(int memoryRAM, int pageSize){
     	tablePages = new PagesTable();
         physicalMemory = new FramesTable();
         countPageFrames = memoryRAM/pageSize;
-
-        for(int i = 0; i <(memoryRAM * 2)/pageSize; i++){
+        int countPagesTable = (memoryRAM * 2)/pageSize;
+        for(int i = 0; i < countPagesTable; i++){
             Page page = new Page(false);
-            page.setPageFrameNumber(-1);
             tablePages.add(page);
+            page.setPageFrameNumber(-1);
         }
     }
-
-    @SuppressWarnings("unchecked")
-	public void inputNumberOfPage(int pageIndex){
-    	Object [] arrayObjects;
+	public void implementLRU(Page page, LRU alg, ArrayList<Object> arrayObjects,int pageNumber){
+        callsSequence.add(pageNumber);
+    	arrayObjects = alg.leastRecentlyUsedAlgorithm(page);
+        physicalMemory.setFrameNotes((FramesTable)arrayObjects.get(0));
+        tablePages.setPagesNotes((PagesTable)arrayObjects.get(1));
+    }
+	public void RequestForNewPage(int pageNumber){
+        Page page = tablePages.get(pageNumber);
+    	ArrayList<Object> arrayObjects = null;
     	LRU alg = new LRU(tablePages, physicalMemory, callsSequence);
-        Page page = tablePages.get(pageIndex);
         if(!page.doesExist()){
             if(physicalMemory.size() < countPageFrames){
-                page.setExistance(true);
                 physicalMemory.add(page);
-                int indexOfPageFrames = physicalMemory.getIndexOf(page);
-                page.setPageFrameNumber(indexOfPageFrames);
-                callsSequence.add(pageIndex);
+                page.setExistance(true);
+                page.setPageFrameNumber(physicalMemory.getIndexOf(page));
+                callsSequence.add(pageNumber);
             }else if(physicalMemory.size() == countPageFrames){
-            	arrayObjects = alg.leastRecentlyUsedAlgorithm(page);
-                callsSequence.add(pageIndex);
-                callsSequence.add(pageIndex);
-                physicalMemory.setFrameNotes((FramesTable)arrayObjects[0]);
-                tablePages.setPagesRecords((ArrayList<Page>)arrayObjects[1]);
-                callsSequence = (ArrayList<Integer>)arrayObjects[2];
+            	implementLRU(page, alg, arrayObjects, pageNumber);
             }
         }
-        printPages();
-        printPageFrames();
+        else {
+            callsSequence.add(pageNumber);
+        }
+       viewInfo();
     }
-
+    
     public int getTablePagesSize(){
         return tablePages.size();
-    }
-
-    public void printPageFrames(){
-        int i = 0;
-        System.out.println("Физическая память\n" + " i бит-присутствия");
-        for (Page page : physicalMemory.getFrameNotes()) {
-            System.out.println(" " + i + "\t" + page.doesExist());
-            i++;
-        }
-        System.out.println();
-    }
-
-    private void printPages(){
-    	int i = 0;
-        System.out.println("Таблица страниц\n" + " i бит-присутс. номер фрейма ");
-        for (Page page : tablePages.getPagesNotes()) {
-        		System.out.println(" " + i + "\t "
-                    + page.doesExist() + "\t " + page.getPageFrameNumber());
-        }
-        i++;
-        System.out.println();
     }
 }

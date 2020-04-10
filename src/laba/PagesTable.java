@@ -5,10 +5,10 @@ import java.util.ArrayList;
 public class PagesTable {
 	private ArrayList<Page> pagesNotes;
 	public ArrayList<Page> getPagesNotes() {
-		return pagesNotes;
+		return  pagesNotes;
 	}
-	public void setPagesRecords(ArrayList<Page> pagesRecords) {
-		this.pagesNotes = pagesRecords;
+	public void setPagesNotes(PagesTable pagesTable) {
+		this.pagesNotes = pagesTable.getPagesNotes();
 	}
 	public PagesTable() {
 		pagesNotes = new ArrayList<Page>();

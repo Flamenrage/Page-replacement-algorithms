@@ -24,7 +24,6 @@ public class FramesTable {
 	}
 	public void add(int index, Page page) {
 		frameNotes.add(index, page);
-
 	}
 	public void add(Page page) {
 		frameNotes.add(page);
